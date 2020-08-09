@@ -18,6 +18,8 @@ configurations {
 }
 
 dependencies {
+
+    // Micronaut Starters
     annotationProcessor(platform("io.micronaut:micronaut-bom:$micronautVersion"))
     annotationProcessor("io.micronaut:micronaut-inject-java")
     annotationProcessor("io.micronaut:micronaut-validation")
@@ -41,13 +43,13 @@ dependencies {
     testImplementation("io.micronaut.test:micronaut-test-junit5")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    // Lexers and Parsers
-    implementation 'de.jflex:jflex:1.8.2'
+    // Testing
+    testImplementation("org.assertj:assertj-core:3.16.1")
 }
 
 test.classpath += configurations.developmentOnly
 
-mainClassName = "nz.ringfence.pauldron.CliCommand"
+mainClassName = "nz.ringfence.pauldron.PauldronCLI"
 
 // use JUnit 5 platform
 test {

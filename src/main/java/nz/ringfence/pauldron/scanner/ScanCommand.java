@@ -1,8 +1,9 @@
 package nz.ringfence.pauldron.scanner;
 
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import java.util.concurrent.Callable;
 
 /**
  * [Pauldron]
@@ -13,7 +14,7 @@ import picocli.CommandLine.Option;
  */
 @Command(name = "scan", description = "Scans for notable code. Currently only supports multi-line comments in Java classes",
         mixinStandardHelpOptions = true)
-public class ScanCommand implements Runnable {
+public class ScanCommand implements Callable<Integer> {
     @Option(names = {"-d", "--directory"}, description = "Directory to scan. Default: Current Directory.")
     String directory = "";
 
@@ -33,7 +34,8 @@ public class ScanCommand implements Runnable {
      * [Impact] This could get very messy in future
      * [Absolute Value] 8
      */
-    public void run() {
+    @Override
+    public Integer call() throws Exception {
         if (verbose) {
             System.out.printf(
                     "\nDirectory to scan: %s | Recursive scan disabled: %s | Sort scheme: %s | Verbose: %s\n",
@@ -49,6 +51,6 @@ public class ScanCommand implements Runnable {
                     sort
             );
         }
-
+        return 0;
     }
 }

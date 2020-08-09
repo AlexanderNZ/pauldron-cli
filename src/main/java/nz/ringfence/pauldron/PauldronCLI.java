@@ -1,32 +1,32 @@
 package nz.ringfence.pauldron;
 
-import io.micronaut.configuration.picocli.PicocliRunner;
-import io.micronaut.context.ApplicationContext;
-
 import nz.ringfence.pauldron.scanner.ScanCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+
+import java.util.concurrent.Callable;
 
 @Command(name = "pauldron",
         description = "Pauldron helps you talk about technical debt.",
         version = "0.0.1",
         subcommands = {ScanCommand.class},
         mixinStandardHelpOptions = true)
-public class CliCommand implements Runnable {
+public class PauldronCLI implements Callable<Integer> {
 
     @Option(names = {"-v", "--verbose"}, description = "Prints additional detail")
     boolean verbose;
 
     public static void main(String[] args) throws Exception {
-        PicocliRunner.run(CliCommand.class, args);
+        int exitCode = new CommandLine(new PauldronCLI()).execute(args);
+        System.exit(exitCode);
     }
 
-    public void run() {
+    public Integer call() throws Exception {
         // business logic here
         if (verbose) {
             System.out.println("Hi!");
         }
+        return 0;
     }
 }

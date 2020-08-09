@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CliCommandTest {
+public class PauldronCLITest {
 
     @Test
     public void testWithCommandLineOption() throws Exception {
@@ -19,7 +19,7 @@ public class CliCommandTest {
 
         try (ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST)) {
             String[] args = new String[] { "-v" };
-            PicocliRunner.run(CliCommand.class, ctx, args);
+            PicocliRunner.call(PauldronCLI.class, ctx, args);
 
             // cli
             assertTrue(baos.toString().contains("Hi!"));
