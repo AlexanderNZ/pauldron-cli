@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
  * [Impact] Problems here will affect all scanning
  * [Absolute Value] 10
  */
-@Command(name = "scan", description = "Scans for notable code. Currently only supports multi-line PauldronJavaCommentLexer.g4 in Java classes",
+@Command(name = "scan", description = "Scans for notable code. Currently only supports multi-line PauldronJavaComments.g4 in Java classes",
         mixinStandardHelpOptions = true)
 public class ScanCommand implements Callable<Integer> {
     @Option(names = {"-d", "--directory"}, description = "Directory to scan. Default: Current Directory.")

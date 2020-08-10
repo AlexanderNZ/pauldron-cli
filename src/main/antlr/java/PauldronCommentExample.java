@@ -1,4 +1,4 @@
-package nz.ringfence.PauldronJavaExample
+package nz.ringfence.PauldronJavaExample;
 
 public class PauldronCommentExample {
     /**
