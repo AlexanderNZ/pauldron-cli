@@ -14,14 +14,16 @@ Pauldron is a CLI tool written in Java 11 with Micronaut and PicoCLI, backed by 
 To get started:
 
 1. Ensure you have the GraalVM Java 11 SDK installed (version `20.1.0.r11` can be easily installed via SDKMAN)
-2. Configure ANTLR4 - a guide exists [here](https://github.com/antlr/antlr4/blob/master/doc/getting-started.md)
-3. Clone the codebase
-4. Import the project into your IDE of choice.
+2. Clone the codebase
+3. Import the project into your IDE of choice.
 5. Use this handy one liner to build and run the CLI application (command and options are just an example):
 
 > `./gradlew assemble && java -jar build/libs/cli-0.1-all.jar scan -d currentDir -s score-asc --no-recursion --verbose`
 
 ### Using ANTLR4 for Lexing and Parsing
+
+> Not in use: Ignore this section, ANTLR4 is complicated, right now for java only we can do the same thing with regex.
+> We don't really NEED this tech until we want to do multi language support.
 
 You can find the source code for lexing and parsing in [src/main/antlr](src/main/antlr).
 

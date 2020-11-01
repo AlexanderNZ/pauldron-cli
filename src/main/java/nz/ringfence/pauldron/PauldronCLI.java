@@ -7,6 +7,14 @@ import picocli.CommandLine.Option;
 
 import java.util.concurrent.Callable;
 
+/**
+ * [Pauldron]
+ * [Short Title] Main Class
+ * [Context] Provides a wrapper over the rest of the cli and provides top level information
+ * [Impact] Minimal
+ * [Absolute Value] 2
+ * [Pauldron]
+ */
 @Command(name = "pauldron",
         description = "Pauldron helps you talk about technical debt.",
         version = "0.0.1",

@@ -17,10 +17,36 @@ class ScanCommandTest {
         System.setOut(new PrintStream(baos));
         ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST);
 
-        String[] args = {"-d", "currentDir", "-s", "sort-asc"};
+        String[] args = {"-d", "src/test/java/nz/ringfence/pauldron/commentSamples", "-s", "sort-asc"};
         PicocliRunner.call(ScanCommand.class, ctx, args);
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(baos.toString()).as("as description").isEqualTo("\nDirectory to scan: currentDir | Sort scheme: sort-asc\n");
+            softly.assertThat(baos.toString()).as("CLI Output").isEqualTo("\nDirectory to scan: src/test/java/nz/ringfence/pauldron/commentSamples | Sort scheme: sort-asc\n" +
+                    "\n" +
+                    "Level One B \n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  3 \n" +
+                    "\n" +
+                    "Level Two A \n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  5 \n" +
+                    "\n" +
+                    "Level One A \n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  2 \n" +
+                    "\n" +
+                    "Top Level \n" +
+                    "Context:  Entry to the application\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  1 \n" +
+                    "\n" +
+                    "Level One C \n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  4 \n"+
+                    "\n");
         });
     }
 
@@ -30,10 +56,56 @@ class ScanCommandTest {
         System.setOut(new PrintStream(baos));
         ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST);
 
-        String[] args = {"-d", "currentDir", "-s", "sort-asc", "--verbose", "--no-recursion"};
+        String[] args = {"-d", "src/test/java/nz/ringfence/pauldron/commentSamples", "-s", "sort-asc", "--verbose", "--no-recursion"};
         PicocliRunner.call(ScanCommand.class, ctx, args);
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(baos.toString()).as("as description").isEqualTo("\nDirectory to scan: currentDir | Recursive scan disabled: true | Sort scheme: sort-asc | Verbose: true\n");
+            softly.assertThat(baos.toString()).as("CLI Output").isEqualTo("\n" +
+                    "Directory to scan: src/test/java/nz/ringfence/pauldron/commentSamples | Recursive scan: false | Sort scheme: sort-asc | Verbose: true\n" +
+                    "\n" +
+                    "Top Level \n" +
+                    "Context:  Entry to the application\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  1 \n" +
+                    "\n");
+        });
+    }
+
+    @Test
+    void callVerboseRecursively() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(baos));
+        ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST);
+
+        String[] args = {"-d", "src/test/java/nz/ringfence/pauldron/commentSamples", "-s", "sort-asc", "--verbose"};
+        PicocliRunner.call(ScanCommand.class, ctx, args);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(baos.toString()).as("CLI Output").isEqualTo("\nDirectory to scan: src/test/java/nz/ringfence/pauldron/commentSamples | Recursive scan: true | Sort scheme: sort-asc | Verbose: true\n" +
+                    "\n" +
+                    "Level One B \n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  3 \n" +
+                    "\n" +
+                    "Level Two A \n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  5 \n" +
+                    "\n" +
+                    "Level One A \n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  2 \n" +
+                    "\n" +
+                    "Top Level \n" +
+                    "Context:  Entry to the application\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  1 \n" +
+                    "\n" +
+                    "Level One C \n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  4 \n" +
+                    "\n");
         });
     }
 }
