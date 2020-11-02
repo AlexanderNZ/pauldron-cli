@@ -55,6 +55,7 @@ public class ScanCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         printInputs();
 
+        // First we need to set up all of the matchers that we'll use to find pauldron comments
         List<List<String>> directoryData = readFiles(directory);
         Pattern completeCommentPattern = Pattern.compile("(?<PauldronCommentStart>\\[Pauldron\\].*$)|(?<ShortTitle>\\[Short Title\\].*$)|(?<Context>\\[Context\\].*$)|(?<Impact>\\[Impact\\].*$)|(?<AbsoluteValue>\\[Absolute Value\\].*$)");
         Pattern commentStartPattern = Pattern.compile("(?<PauldronCommentStart>\\[Pauldron\\].*$)");
@@ -63,49 +64,72 @@ public class ScanCommand implements Callable<Integer> {
         Pattern contextPattern = Pattern.compile("(?<Context>\\[Context\\].*$)");
         Pattern absoluteValuePattern = Pattern.compile("(?<AbsoluteValue>\\[Absolute Value\\].*$)");
 
+        // Raw comments are ones that contain a line of text that matches a regex above, no processing applied.
         List<String> rawPauldronCommentList = new ArrayList<>();
-        Set<PauldronComment> pauldronComments = new HashSet<>();
+
+        // Processed comments have had all content before the closing square brace removed.
+        Set<PauldronComment> processedCauldronCommentsList = new HashSet<>();
 
         directoryData.forEach(file -> {
-            file.forEach(line -> {
-                Matcher matcher = completeCommentPattern.matcher(line);
-                if (matcher.find()) {
-                    rawPauldronCommentList.add(line);
-                }
-            });
-
-            PauldronComment comment = new PauldronComment();
-
-            for (String pauldronCommentLine : rawPauldronCommentList) {
-                Matcher commentStartMatcher = commentStartPattern.matcher(pauldronCommentLine);
-                Matcher shortTitleMatcher = shortTitlePattern.matcher(pauldronCommentLine);
-                Matcher impactMatcher = impactPattern.matcher(pauldronCommentLine);
-                Matcher contextMatcher = contextPattern.matcher(pauldronCommentLine);
-                Matcher absoluteValueMatcher = absoluteValuePattern.matcher(pauldronCommentLine);
-                int startOfPauldronCommentContent = pauldronCommentLine.lastIndexOf(']') + 2;
-
-                if (shortTitleMatcher.find()) {
-                    comment.setShortTitle(pauldronCommentLine.substring(startOfPauldronCommentContent));
-                } else if (impactMatcher.find()) {
-                    comment.setImpact(pauldronCommentLine.substring(startOfPauldronCommentContent));
-                } else if (contextMatcher.find()) {
-                    comment.setContext(pauldronCommentLine.substring(startOfPauldronCommentContent));
-                } else if (absoluteValueMatcher.find()) {
-                    comment.setAbsoluteValue(Integer.parseInt(pauldronCommentLine.substring(startOfPauldronCommentContent)));
-                } else if (commentStartMatcher.find()) {
-                    if (comment.getShortTitle() != null && !comment.getShortTitle().isEmpty()) {
-                        pauldronComments.add(comment);
-                    }
-                    comment = new PauldronComment();
-                }
-            }
+            extractLinesFromAllFiles(completeCommentPattern, rawPauldronCommentList, file);
+            convertCommentStringsToPauldronCommentObjects(
+                    commentStartPattern,
+                    shortTitlePattern,
+                    impactPattern,
+                    contextPattern,
+                    absoluteValuePattern,
+                    rawPauldronCommentList,
+                    processedCauldronCommentsList);
         });
 
-        pauldronComments.stream()
+        processedCauldronCommentsList.stream()
                 .map(ScanCommand::formatQuestion)
                 .forEach(System.out::println);
-
         return 0;
+    }
+
+    private void convertCommentStringsToPauldronCommentObjects(
+            Pattern commentStartPattern,
+            Pattern shortTitlePattern,
+            Pattern impactPattern,
+            Pattern contextPattern,
+            Pattern absoluteValuePattern,
+            List<String> rawPauldronCommentList,
+            Set<PauldronComment> processedCauldronCommentsList) {
+        PauldronComment comment = new PauldronComment();
+
+        for (String pauldronCommentLine : rawPauldronCommentList) {
+            Matcher commentStartMatcher = commentStartPattern.matcher(pauldronCommentLine);
+            Matcher shortTitleMatcher = shortTitlePattern.matcher(pauldronCommentLine);
+            Matcher impactMatcher = impactPattern.matcher(pauldronCommentLine);
+            Matcher contextMatcher = contextPattern.matcher(pauldronCommentLine);
+            Matcher absoluteValueMatcher = absoluteValuePattern.matcher(pauldronCommentLine);
+            int startOfPauldronCommentContent = pauldronCommentLine.lastIndexOf(']') + 2;
+
+            if (shortTitleMatcher.find()) {
+                comment.setShortTitle(pauldronCommentLine.substring(startOfPauldronCommentContent));
+            } else if (impactMatcher.find()) {
+                comment.setImpact(pauldronCommentLine.substring(startOfPauldronCommentContent));
+            } else if (contextMatcher.find()) {
+                comment.setContext(pauldronCommentLine.substring(startOfPauldronCommentContent));
+            } else if (absoluteValueMatcher.find()) {
+                comment.setAbsoluteValue(Integer.parseInt(pauldronCommentLine.substring(startOfPauldronCommentContent)));
+            } else if (commentStartMatcher.find()) {
+                if (comment.getShortTitle() != null && !comment.getShortTitle().isEmpty()) {
+                    processedCauldronCommentsList.add(comment);
+                }
+                comment = new PauldronComment();
+            }
+        }
+    }
+
+    private void extractLinesFromAllFiles(Pattern completeCommentPattern, List<String> rawPauldronCommentList, List<String> file) {
+        file.forEach(line -> {
+            Matcher matcher = completeCommentPattern.matcher(line);
+            if (matcher.find()) {
+                rawPauldronCommentList.add(line);
+            }
+        });
     }
 
     static private String formatQuestion(final PauldronComment comment) {
