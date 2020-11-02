@@ -56,7 +56,6 @@ public class ScanCommand implements Callable<Integer> {
         // First we need to set up all of the matchers that we'll use to find pauldron comments
         Set<PauldronFile> listOfFilesToBeScanned = new HashSet<>();
         readFiles(listOfFilesToBeScanned, directory);
-        Pattern completeCommentPattern = Pattern.compile("(?<PauldronCommentStart>\\[Pauldron\\].*$)|(?<ShortTitle>\\[Short Title\\].*$)|(?<Context>\\[Context\\].*$)|(?<Impact>\\[Impact\\].*$)|(?<AbsoluteValue>\\[Absolute Value\\].*$)");
         Pattern commentStartPattern = Pattern.compile("(?<PauldronCommentStart>\\[Pauldron\\].*$)");
         Pattern shortTitlePattern = Pattern.compile("(?<ShortTitle>\\[Short Title\\].*$)");
         Pattern impactPattern = Pattern.compile("(?<Impact>\\[Impact\\].*$)");
