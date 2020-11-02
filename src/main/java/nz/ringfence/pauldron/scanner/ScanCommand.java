@@ -1,6 +1,7 @@
 package nz.ringfence.pauldron.scanner;
 
 import nz.ringfence.pauldron.model.PauldronComment;
+import nz.ringfence.pauldron.model.PauldronFile;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Help.Ansi;
@@ -10,10 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,7 +54,8 @@ public class ScanCommand implements Callable<Integer> {
         printInputs();
 
         // First we need to set up all of the matchers that we'll use to find pauldron comments
-        List<List<String>> directoryData = readFiles(directory);
+        Set<PauldronFile> listOfFilesToBeScanned = new HashSet<>();
+        readFiles(listOfFilesToBeScanned, directory);
         Pattern completeCommentPattern = Pattern.compile("(?<PauldronCommentStart>\\[Pauldron\\].*$)|(?<ShortTitle>\\[Short Title\\].*$)|(?<Context>\\[Context\\].*$)|(?<Impact>\\[Impact\\].*$)|(?<AbsoluteValue>\\[Absolute Value\\].*$)");
         Pattern commentStartPattern = Pattern.compile("(?<PauldronCommentStart>\\[Pauldron\\].*$)");
         Pattern shortTitlePattern = Pattern.compile("(?<ShortTitle>\\[Short Title\\].*$)");
@@ -64,27 +63,22 @@ public class ScanCommand implements Callable<Integer> {
         Pattern contextPattern = Pattern.compile("(?<Context>\\[Context\\].*$)");
         Pattern absoluteValuePattern = Pattern.compile("(?<AbsoluteValue>\\[Absolute Value\\].*$)");
 
-        // Raw comments are ones that contain a line of text that matches a regex above, no processing applied.
-        List<String> rawPauldronCommentList = new ArrayList<>();
 
-        // Processed comments have had all content before the closing square brace removed.
-        Set<PauldronComment> processedCauldronCommentsList = new HashSet<>();
 
-        directoryData.forEach(file -> {
-            extractLinesFromAllFiles(completeCommentPattern, rawPauldronCommentList, file);
+        listOfFilesToBeScanned.forEach(file -> {
             convertCommentStringsToPauldronCommentObjects(
                     commentStartPattern,
                     shortTitlePattern,
                     impactPattern,
                     contextPattern,
                     absoluteValuePattern,
-                    rawPauldronCommentList,
-                    processedCauldronCommentsList);
+                    file);
+
+            file.getProcessedCauldronCommentsList().stream()
+                    .map(ScanCommand::formatQuestion)
+                    .forEach(System.out::println);
         });
 
-        processedCauldronCommentsList.stream()
-                .map(ScanCommand::formatQuestion)
-                .forEach(System.out::println);
         return 0;
     }
 
@@ -94,11 +88,10 @@ public class ScanCommand implements Callable<Integer> {
             Pattern impactPattern,
             Pattern contextPattern,
             Pattern absoluteValuePattern,
-            List<String> rawPauldronCommentList,
-            Set<PauldronComment> processedCauldronCommentsList) {
+            PauldronFile commentFile) {
         PauldronComment comment = new PauldronComment();
 
-        for (String pauldronCommentLine : rawPauldronCommentList) {
+        for (String pauldronCommentLine : commentFile.getRawPauldronCommentList()) {
             Matcher commentStartMatcher = commentStartPattern.matcher(pauldronCommentLine);
             Matcher shortTitleMatcher = shortTitlePattern.matcher(pauldronCommentLine);
             Matcher impactMatcher = impactPattern.matcher(pauldronCommentLine);
@@ -116,29 +109,23 @@ public class ScanCommand implements Callable<Integer> {
                 comment.setAbsoluteValue(Integer.parseInt(pauldronCommentLine.substring(startOfPauldronCommentContent)));
             } else if (commentStartMatcher.find()) {
                 if (comment.getShortTitle() != null && !comment.getShortTitle().isEmpty()) {
-                    processedCauldronCommentsList.add(comment);
+                    comment.setParentFilePath(commentFile.getFilePath());
+                    commentFile.getProcessedCauldronCommentsList().add(comment);
                 }
                 comment = new PauldronComment();
             }
         }
     }
 
-    private void extractLinesFromAllFiles(Pattern completeCommentPattern, List<String> rawPauldronCommentList, List<String> file) {
-        file.forEach(line -> {
-            Matcher matcher = completeCommentPattern.matcher(line);
-            if (matcher.find()) {
-                rawPauldronCommentList.add(line);
-            }
-        });
-    }
-
     static private String formatQuestion(final PauldronComment comment) {
         return Ansi.AUTO.string(String.format(
                 "@|bold,green %s |@\n" +
-                        "@|bold,green Context: |@ %s\n" +
-                        "@|bold,green Impact: |@ %s\n" +
+                        "File: %s\n" +
+                        "Context: %s\n" +
+                        "@|green Impact: |@ %s\n" +
                         "@|bold,green Absolute Value: |@ %d \n",
                 comment.getShortTitle(),
+                comment.getParentFilePath().toString(),
                 comment.getContext(),
                 comment.getImpact(),
                 comment.getAbsoluteValue()
@@ -163,15 +150,18 @@ public class ScanCommand implements Callable<Integer> {
         }
     }
 
-    private List<List<String>> readFiles(String inputDirectory) {
-        List<Path> files = new ArrayList<>();
+    private Set<PauldronFile> readFiles(Set<PauldronFile> pauldronFileSet, String inputDirectory) {
 
         if (recursive) {
             try (Stream<Path> walk = Files.walk(Paths.get(inputDirectory))) {
                 List<String> result = walk.filter(Files::isRegularFile)
                         .map(Path::toString).collect(Collectors.toList());
 
-                result.forEach(item -> files.add(Path.of(item)));
+                result.forEach(item -> {
+                    PauldronFile pauldronFile = new PauldronFile();
+                    pauldronFile.setFilePath(Path.of(item));
+                    pauldronFileSet.add(pauldronFile);
+                });
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -183,24 +173,27 @@ public class ScanCommand implements Callable<Integer> {
                         .map(Path::toString)
                         .collect(Collectors.toList());
 
-                result.forEach(item -> files.add(Path.of(item)));
+                result.forEach(item -> {
+                    PauldronFile pauldronFile = new PauldronFile();
+                    pauldronFile.setFilePath(Path.of(item));
+                    pauldronFileSet.add(pauldronFile);
+                });
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        List<List<String>> filesAndStrings = new ArrayList<>();
-
         // Then for each file in the specified directory, create a list of strings in the file
-        files.forEach(file -> {
+        pauldronFileSet.forEach(file -> {
             List<String> returnedLines = new ArrayList<>();
-            try (Stream<String> lines = Files.lines(Path.of(file.toString()), StandardCharsets.UTF_8)) {
+            try (Stream<String> lines = Files.lines(Path.of(file.getFilePath().toString()), StandardCharsets.UTF_8)) {
                 returnedLines = lines.collect(Collectors.toList());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            filesAndStrings.add(returnedLines);
+            file.setRawPauldronCommentList(returnedLines);
         });
-        return filesAndStrings;
+        return pauldronFileSet;
     }
 }

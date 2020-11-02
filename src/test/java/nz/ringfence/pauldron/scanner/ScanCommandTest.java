@@ -22,30 +22,35 @@ class ScanCommandTest {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(baos.toString()).as("CLI Output").isEqualTo("\nDirectory to scan: src/test/java/nz/ringfence/pauldron/commentSamples | Sort scheme: sort-asc\n" +
                     "\n" +
-                    "Level One B \n" +
-                    "Context:  Next Level\n" +
-                    "Impact:  Minimal\n" +
-                    "Absolute Value:  3 \n" +
-                    "\n" +
-                    "Level Two A \n" +
-                    "Context:  Next Level\n" +
-                    "Impact:  Minimal\n" +
-                    "Absolute Value:  5 \n" +
-                    "\n" +
                     "Level One A \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/levelOne/LevelOneSampleA.java\n" +
                     "Context:  Next Level\n" +
                     "Impact:  Minimal\n" +
                     "Absolute Value:  2 \n" +
                     "\n" +
+                    "Level One C \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/levelOne/LevelOneSampleC.java\n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  4 \n" +
+                    "\n" +
                     "Top Level \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/TopLevelSample.java\n" +
                     "Context:  Entry to the application\n" +
                     "Impact:  Minimal\n" +
                     "Absolute Value:  1 \n" +
                     "\n" +
-                    "Level One C \n" +
+                    "Level Two A \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/levelOne/levelTwo/LevelTwoSampleA.java\n" +
                     "Context:  Next Level\n" +
                     "Impact:  Minimal\n" +
-                    "Absolute Value:  4 \n"+
+                    "Absolute Value:  5 \n" +
+                    "\n" +
+                    "Level One B \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/levelOne/LevelOneSampleB.java\n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  3 \n" +
                     "\n");
         });
     }
@@ -63,6 +68,7 @@ class ScanCommandTest {
                     "Directory to scan: src/test/java/nz/ringfence/pauldron/commentSamples | Recursive scan: false | Sort scheme: sort-asc | Verbose: true\n" +
                     "\n" +
                     "Top Level \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/TopLevelSample.java\n" +
                     "Context:  Entry to the application\n" +
                     "Impact:  Minimal\n" +
                     "Absolute Value:  1 \n" +
@@ -81,30 +87,35 @@ class ScanCommandTest {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(baos.toString()).as("CLI Output").isEqualTo("\nDirectory to scan: src/test/java/nz/ringfence/pauldron/commentSamples | Recursive scan: true | Sort scheme: sort-asc | Verbose: true\n" +
                     "\n" +
-                    "Level One B \n" +
-                    "Context:  Next Level\n" +
-                    "Impact:  Minimal\n" +
-                    "Absolute Value:  3 \n" +
-                    "\n" +
-                    "Level Two A \n" +
-                    "Context:  Next Level\n" +
-                    "Impact:  Minimal\n" +
-                    "Absolute Value:  5 \n" +
-                    "\n" +
                     "Level One A \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/levelOne/LevelOneSampleA.java\n" +
                     "Context:  Next Level\n" +
                     "Impact:  Minimal\n" +
                     "Absolute Value:  2 \n" +
                     "\n" +
+                    "Level One C \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/levelOne/LevelOneSampleC.java\n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  4 \n" +
+                    "\n" +
                     "Top Level \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/TopLevelSample.java\n" +
                     "Context:  Entry to the application\n" +
                     "Impact:  Minimal\n" +
                     "Absolute Value:  1 \n" +
                     "\n" +
-                    "Level One C \n" +
+                    "Level Two A \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/levelOne/levelTwo/LevelTwoSampleA.java\n" +
                     "Context:  Next Level\n" +
                     "Impact:  Minimal\n" +
-                    "Absolute Value:  4 \n" +
+                    "Absolute Value:  5 \n" +
+                    "\n" +
+                    "Level One B \n" +
+                    "File:  src/test/java/nz/ringfence/pauldron/commentSamples/levelOne/LevelOneSampleB.java\n" +
+                    "Context:  Next Level\n" +
+                    "Impact:  Minimal\n" +
+                    "Absolute Value:  3 \n" +
                     "\n");
         });
     }

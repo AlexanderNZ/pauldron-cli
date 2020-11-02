@@ -1,5 +1,6 @@
 package nz.ringfence.pauldron.model;
 
+import java.nio.file.Path;
 import java.util.Objects;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Objects;
  */
 public class PauldronComment {
     String shortTitle;
-    String fileLocation;
+    Path parentFilePath;
     String impact;
     String context;
     Integer absoluteValue;
@@ -28,8 +29,8 @@ public class PauldronComment {
         this.shortTitle = shortTitle;
     }
 
-    public String getFileLocation() {
-        return fileLocation;
+    public Path getParentFilePath() {
+        return parentFilePath;
     }
 
     public String getImpact() {
@@ -40,8 +41,8 @@ public class PauldronComment {
         this.impact = impact;
     }
 
-    public void setFileLocation(String fileLocation) {
-        this.fileLocation = fileLocation;
+    public void setParentFilePath(Path parentFilePath) {
+        this.parentFilePath = parentFilePath;
     }
 
     public String getContext() {
