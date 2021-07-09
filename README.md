@@ -9,7 +9,7 @@ Use Pauldron to:
 
 ## Developing
 
-Pauldron is a CLI tool written in Java 11 with Micronaut and PicoCLI, backed by ANTLR4 lexers and parsers.
+Pauldron is a CLI tool written in Java 11 with Micronaut and PicoCLI, backed by ~~ANTLR4 lexers and parsers~~ regex lol.
 
 To get started:
 
