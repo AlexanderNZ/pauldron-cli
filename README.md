@@ -18,4 +18,6 @@ To get started:
 3. Import the project into your IDE of choice.
 5. Use this handy one liner to build and run the CLI application (command and options are just an example):
 
-> `./gradlew assemble && java -jar build/libs/cli-0.1-all.jar scan -d currentDir -s score-asc --no-recursion --verbose`
+> `./gradlew assemble && java -jar build/libs/cli-0.1-all.jar scan -d src -s score-asc --no-recursion --verbose`
+
+Alternatively, run the tests [here](src/test/java/nz/ringfence/pauldron/scanner/ScanCommandTest.java)

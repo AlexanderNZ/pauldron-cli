@@ -1,3 +1,3 @@
 micronaut:
   application:
-    name: cli
+    name: pauldron-cli
