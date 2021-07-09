@@ -77,6 +77,11 @@ public class ScanCommand implements Callable<Integer> {
                     absoluteValuePattern,
                     file);
 
+            // TODO: Modify this so that all comments in one file are printed in asc | desc order by absolute value
+            //  before moving on to the next file. May also be worthwhile sorting files by sum(absolute value)
+            //  i.e. File 1 has 2 comments, abs_v of 1 and 3, file 1 is worth 4 total.
+            //  File 2 has 3 comments, abs_v 1, 2, 3. Total of 6.
+            //  Print order is File 2, comment 3, 2, 1 followed by file 1, comment 3, 1
             file.getProcessedCauldronCommentsList().stream()
                     .map(ScanCommand::formatPauldronComment)
                     .forEach(System.out::println);
