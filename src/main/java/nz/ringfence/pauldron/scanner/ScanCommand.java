@@ -121,8 +121,8 @@ public class ScanCommand implements Callable<Integer> {
                 "@|bold,green %s |@\n" +
                         "File: %s\n" +
                         "Context: %s\n" +
-                        "@|green Impact: |@ %s\n" +
-                        "@|bold,green Absolute Value: |@ %d \n",
+                        "@|green Impact: |@%s\n" +
+                        "@|bold,green Absolute Value: |@%d \n",
                 comment.getShortTitle(),
                 comment.getParentFilePath().toString(),
                 comment.getContext(),

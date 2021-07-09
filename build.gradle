@@ -1,9 +1,12 @@
 plugins {
-    id "com.diffplug.eclipse.apt" version "3.22.0"
-    id "com.github.johnrengelman.shadow" version "6.0.0"
+    id "com.diffplug.eclipse.apt" version "3.30.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.ben-manes.versions" version "0.39.0"
     id "application"
-    id "antlr"
-    id "idea"
+}
+
+ext {
+    micronautVersion='2.5.7'
 }
 
 version "0.1"
@@ -26,7 +29,7 @@ dependencies {
     annotationProcessor("io.micronaut:micronaut-inject-java")
     annotationProcessor("io.micronaut:micronaut-validation")
     annotationProcessor("io.micronaut:micronaut-graal")
-    annotationProcessor("info.picocli:picocli-codegen:4.2.0")
+    annotationProcessor("info.picocli:picocli-codegen:4.6.1")
     compileOnly(platform("io.micronaut:micronaut-bom:$micronautVersion"))
     compileOnly("org.graalvm.nativeimage:svm")
     implementation(platform("io.micronaut:micronaut-bom:$micronautVersion"))
@@ -46,11 +49,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     // Testing
-    testImplementation("org.assertj:assertj-core:3.16.1")
-
-    // Parsing
-    antlr "org.antlr:antlr4:4.7.2"
-    implementation "org.antlr:antlr4-runtime:4.7.2"
+    testImplementation("org.assertj:assertj-core:3.20.2")
 }
 
 test.classpath += configurations.developmentOnly
@@ -63,8 +62,8 @@ test {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion('11')
-    targetCompatibility = JavaVersion.toVersion('11')
+    sourceCompatibility = JavaVersion.toVersion('16')
+    targetCompatibility = JavaVersion.toVersion('16')
 }
 
 tasks.withType(JavaCompile) {
@@ -95,25 +94,7 @@ tasks.withType(JavaExec) {
     }
 }
 
-
-generateGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ['-package', 'nz.ringfence.pauldron.PauldronCommentParser']
-    outputDirectory = new File("generated-src/antlr/main/nz/ringfence/pauldron/PauldronCommentParser".toString())
-}
-compileJava.dependsOn generateGrammarSource
-sourceSets {
-    generated {
-        java.srcDir 'generated-src/antlr/main/'
-    }
-}
-compileJava.source sourceSets.generated.java, sourceSets.main.java
-clean{
-    delete "generated-src"
-}
-idea {
-    module {
-        sourceDirs += file("generated-src/antlr/main")
-    }
+dependencyUpdates {
+    outputFormatter = "html"
 }
 
